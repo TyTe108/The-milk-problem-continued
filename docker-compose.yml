@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  postgres-api:
+    image: postgres:14.3
+    container_name: milk-database
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: 'milk_development'
+      POSTGRES_USER: 'milk'
+      POSTGRES_PASSWORD: 'milk'
+      ADDITIONAL_POSTGRES_DB: 'milk_test'
+    volumes:
+      - init-scripts:/docker-entrypoint-initdb.d
+      - pg-data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3.10.5-management
+    container_name: milk-rabbit
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - rabbit-data:/var/lib/rabbitmq/
+      - rabbit-log:/var/log/rabbitmq
+
+volumes:
+  pg-data:
+  rabbit-data:
+  rabbit-log:
+  init-scripts:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PWD}/databases/init-scripts
+      o: bind
